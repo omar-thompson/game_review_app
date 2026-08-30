@@ -12,8 +12,16 @@ const PORT = process.env.PORT || 5001;
 app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) => {
+app.use(express.static("../frontend/dist"));
+
+app.get("/api", (req, res)=> {
   res.send("Game Review API is running!");
+});
+
+app.get("/", (req, res) => {
+  res.sendFile("index.html", {
+    root: "../frontend/dist",
+  });
 });
 
 connectDB();
