@@ -1,7 +1,7 @@
 import { UserMenu } from "./UserMenu";
 
 // ─── Nav ──────────────────────────────────────────────────────────────────────
-export default function Nav({ authUser, onLoginClick, onLogout, onLogoClick, onMyReviews, onAdminPanel }) {
+export default function Nav({ authUser, onLoginClick, onLogout, onLogoClick, onMyReviews, onAdminPanel, onManageUsers }) {
   return (
     <header className="sticky top-0 z-50 border-b"
       style={{ background: "color-mix(in srgb, var(--background) 85%, transparent)", backdropFilter: "blur(16px)", borderColor: "var(--border)" }}>
@@ -24,7 +24,7 @@ export default function Nav({ authUser, onLoginClick, onLogout, onLogoClick, onM
             <span>Search games…</span>
           </div>
           {authUser ? (
-            <UserMenu user={authUser} onLogout={onLogout} onMyReviews={onMyReviews} onAdminPanel={onAdminPanel} />
+            <UserMenu user={authUser} onLogout={onLogout} onMyReviews={onMyReviews} onAdminPanel={onAdminPanel} onManageUsers={onManageUsers} />
           ) : (
             <button onClick={onLoginClick} className="px-4 py-1.5 rounded text-sm font-bold uppercase tracking-wider transition-all hover:opacity-90 active:scale-95"
               style={{ fontFamily: "var(--font-display)", background: "var(--primary)", color: "white" }}>Sign In</button>
