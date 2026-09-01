@@ -25,7 +25,8 @@ const registerUser = async (req, res) => {
       role: user.role,
     });
   } catch (error) {
-    res.status(500).json({ message: "Registration failed", error: error.message });
+    console.error("Registration error:", error);
+    res.status(500).json({ message: "Registration failed" });
   }
 };
 
@@ -52,7 +53,8 @@ const loginUser = async (req, res) => {
       role: user.role,
     });
   } catch (error) {
-    res.status(500).json({ message: "Login failed", error: error.message });
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Login failed" });
   }
 };
 
