@@ -27,3 +27,9 @@ export const authApi = {
   logout: () => request("/auth/logout", { method: "POST" }),
   me: () => request("/auth/me"),
 };
+
+export const userApi = {
+  list: () => request("/users"),
+  update: (id, updates) => request(`/users/${id}`, { method: "PUT", body: JSON.stringify(updates) }),
+  remove: (id) => request(`/users/${id}`, { method: "DELETE" }),
+};

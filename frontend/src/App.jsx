@@ -3,17 +3,19 @@ import Nav from "./components/Nav";
 import HomePage from "./components/HomePage";
 import LoginModal from "./components/LoginModal";
 import ComingSoon from "./components/ComingSoon";
+import AdminUsersPage from "./components/AdminUsersPage";
 import { authApi } from "./utils/api";
 
 // ─── App root ─────────────────────────────────────────────────────────────────
-// GameDetailPage, AdminPanel, and MyReviewsPage are stubbed with
-// ComingSoon for now and will be built out in later stages.
+// GameDetailPage and MyReviewsPage are stubbed with ComingSoon for now
+// and will be built out in later stages.
 export default function App() {
   const [authUser, setAuthUser] = useState(null);
   const [showLogin, setShowLogin] = useState(false);
   const [selectedGame, setSelectedGame] = useState(null);
   const [showMyReviews, setShowMyReviews] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
+  const [showManageUsers, setShowManageUsers] = useState(false);
 
   useEffect(() => {
     authApi.me().then(setAuthUser).catch(() => setAuthUser(null));
@@ -36,6 +38,7 @@ export default function App() {
   function handleBack() {
     setSelectedGame(null);
     setShowMyReviews(false);
+    setShowManageUsers(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
   function handleMyReviews() {
@@ -53,9 +56,12 @@ export default function App() {
         onLogoClick={handleBack}
         onMyReviews={handleMyReviews}
         onAdminPanel={() => setShowAdmin(true)}
+        onManageUsers={() => setShowManageUsers(true)}
       />
 
-      {showMyReviews ? (
+      {showManageUsers ? (
+        <AdminUsersPage currentUserId={authUser?._id} onBack={handleBack} />
+      ) : showMyReviews ? (
         <ComingSoon title="My Reviews" onBack={handleBack} />
       ) : selectedGame ? (
         <ComingSoon title={selectedGame.title} onBack={handleBack} />

@@ -10,7 +10,7 @@ function getInitials(name) {
 }
 
 // ─── User menu ────────────────────────────────────────────────────────────────
-export function UserMenu({ user, onLogout, onMyReviews, onAdminPanel }) {
+export function UserMenu({ user, onLogout, onMyReviews, onAdminPanel, onManageUsers }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -42,7 +42,7 @@ export function UserMenu({ user, onLogout, onMyReviews, onAdminPanel }) {
             <>
               <MenuLink icon="📊" label="Admin Panel" onClick={() => { onAdminPanel(); setOpen(false); }} />
               <MenuLink icon="✅" label="Manage Reviews" onClick={() => { onAdminPanel(); setOpen(false); }} />
-              <MenuLink icon="👥" label="Users" onClick={() => { onAdminPanel(); setOpen(false); }} />
+              <MenuLink icon="👥" label="Users" onClick={() => { onManageUsers(); setOpen(false); }} />
               <MenuLink icon="⚙️" label="Settings" />
             </>
           )}
