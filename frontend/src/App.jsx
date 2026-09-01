@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Nav from "./components/Nav";
 import HomePage from "./components/HomePage";
 import LoginModal from "./components/LoginModal";
 import ComingSoon from "./components/ComingSoon";
+import { authApi } from "./utils/api";
 
 // ─── App root ─────────────────────────────────────────────────────────────────
-// Stage 1 scope: Home Page + Nav Bar + Login (demo auth only).
 // GameDetailPage, AdminPanel, and MyReviewsPage are stubbed with
 // ComingSoon for now and will be built out in later stages.
 export default function App() {
@@ -14,6 +14,19 @@ export default function App() {
   const [selectedGame, setSelectedGame] = useState(null);
   const [showMyReviews, setShowMyReviews] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
+
+  useEffect(() => {
+    authApi.me().then(setAuthUser).catch(() => setAuthUser(null));
+  }, []);
+
+  async function handleLogout() {
+    try {
+      await authApi.logout();
+    } finally {
+      setAuthUser(null);
+      setShowMyReviews(false);
+    }
+  }
 
   function handleGameClick(g) {
     setSelectedGame(g);
@@ -36,7 +49,7 @@ export default function App() {
       <Nav
         authUser={authUser}
         onLoginClick={() => setShowLogin(true)}
-        onLogout={() => { setAuthUser(null); setShowMyReviews(false); }}
+        onLogout={handleLogout}
         onLogoClick={handleBack}
         onMyReviews={handleMyReviews}
         onAdminPanel={() => setShowAdmin(true)}
