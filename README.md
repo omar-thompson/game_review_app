@@ -35,6 +35,7 @@ Create a `.env` file in `backend/` with:
 ```
 MONGO_URI=<your MongoDB connection string>
 PORT=5001
+JWT_SECRET=<a random secret, e.g. output of: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))">
 ```
 
 Run it:
@@ -59,7 +60,6 @@ npm run build
 
 ## Known limitations
 
-- User registration and login are not yet wired to the backend — the login UI currently authenticates against mock demo data as a placeholder for the in-progress registration/login API work
 - Game discovery, reviews, and Play Later functionality are designed (see system design and Jira backlog) but not yet implemented
 - No automated test suite yet
 - No CI/CD — deployment to EC2 is manual (documented in the project report)
@@ -86,10 +86,11 @@ npm run build
    git pull
    ```
 
-3. Create `backend/.env` with the required environment variables (first-time setup only — do not commit this file):
+3. Create `backend/.env` with the required environment variables (first-time setup only — do not commit this file). Note this file is not tracked in git, so it must be created directly on the instance and won't be brought in by `git pull`:
    ```
    MONGO_URI=<MongoDB Atlas connection string>
    PORT=5001
+   JWT_SECRET=<a random secret, e.g. output of: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))">
    ```
 
 4. Install dependencies (first-time setup, or after a `git pull` that changes dependencies):
@@ -119,7 +120,7 @@ npm run build
 
 - The application port (5001) must be allowed inbound on the EC2 instance's security group. SSH (port 22) is restricted to specific IPs and should remain so.
 - **Known limitation**: this AWS sandbox environment does not permit opening the security group to `0.0.0.0/0`. The inbound rule for port 5001 must be updated to the marker's IP address (or current network) ahead of the marking window.
-- No secrets (MongoDB credentials) are committed to the repository — they are configured via `backend/.env` on the instance, which is excluded via `.gitignore`.
+- No secrets (MongoDB credentials, JWT signing secret) are committed to the repository — they are configured via `backend/.env` on the instance, which is excluded via `.gitignore`.
 
 ### Stopping the app
 
