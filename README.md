@@ -66,4 +66,64 @@ npm run build
 
 ## Deployment
 
-Live URL: *[add EC2 public URL here]*
+**Live URL**: http://<EC2-public-IP>:5001 *(update with current IP if it changes)*
+
+### Manual deployment procedure (EC2)
+
+1. SSH into the instance:
+   ```
+   ssh -i /path/to/key.pem ubuntu@<EC2-public-IP>
+   ```
+
+2. Clone the repository (first-time setup only):
+   ```
+   git clone https://github.com/omar-thompson/game_review_app.git
+   cd game_review_app
+   ```
+   For subsequent deployments, pull the latest changes instead:
+   ```
+   cd ~/game_review_app
+   git pull
+   ```
+
+3. Create `backend/.env` with the required environment variables (first-time setup only — do not commit this file):
+   ```
+   MONGO_URI=<MongoDB Atlas connection string>
+   PORT=5001
+   ```
+
+4. Install dependencies (first-time setup, or after a `git pull` that changes dependencies):
+   ```
+   npm run install-all
+   ```
+
+5. Start the app under pm2 so it keeps running after the SSH session ends:
+   ```
+   pm2 start npm --name game-review-app -- start
+   pm2 save
+   ```
+   This builds the frontend and starts the backend, which serves the built frontend and the API from a single process on port 5001.
+
+   If the app is already running under pm2 and you're redeploying updated code:
+   ```
+   pm2 restart game-review-app
+   ```
+
+6. Confirm it's running:
+   ```
+   pm2 logs game-review-app --lines 20
+   ```
+   Look for `Server running on http://localhost:5001` and `MongoDB connected`.
+
+### Security configuration
+
+- The application port (5001) must be allowed inbound on the EC2 instance's security group. SSH (port 22) is restricted to specific IPs and should remain so.
+- **Known limitation**: this AWS sandbox environment does not permit opening the security group to `0.0.0.0/0`. The inbound rule for port 5001 must be updated to the marker's IP address (or current network) ahead of the marking window.
+- No secrets (MongoDB credentials) are committed to the repository — they are configured via `backend/.env` on the instance, which is excluded via `.gitignore`.
+
+### Stopping the app
+
+```
+pm2 stop game-review-app     # stop, keep registered with pm2
+pm2 delete game-review-app   # stop and remove from pm2 entirely
+```
