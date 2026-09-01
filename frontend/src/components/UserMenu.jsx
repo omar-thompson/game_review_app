@@ -1,5 +1,14 @@
 import { useState } from "react";
 
+function getInitials(name) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0].toUpperCase())
+    .join("");
+}
+
 // ─── User menu ────────────────────────────────────────────────────────────────
 export function UserMenu({ user, onLogout, onMyReviews, onAdminPanel }) {
   const [open, setOpen] = useState(false);
@@ -11,7 +20,7 @@ export function UserMenu({ user, onLogout, onMyReviews, onAdminPanel }) {
         style={{ borderColor: "var(--border)" }}>
         <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-black"
           style={{ background: "var(--primary)", color: "white", fontFamily: "var(--font-display)" }}>
-          {user.avatar}
+          {getInitials(user.name)}
         </div>
         <span className="text-sm font-medium hidden sm:inline">{user.name.split(" ")[0]}</span>
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`transition-transform ${open ? "rotate-180" : ""}`} style={{ color: "var(--muted-foreground)" }}><path d="m6 9 6 6 6-6"/></svg>
