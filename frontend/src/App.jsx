@@ -4,32 +4,41 @@ import HomePage from "./components/HomePage";
 import LoginModal from "./components/LoginModal";
 import ComingSoon from "./components/ComingSoon";
 import AdminUsersPage from "./components/AdminUsersPage";
+import GameDetailPage from "./components/GameDetailPage";
+import MyReviewsPage from "./components/MyReviewsPage";
 import { authApi } from "./utils/api";
 
 // ─── App root ─────────────────────────────────────────────────────────────────
-// GameDetailPage and MyReviewsPage are stubbed with ComingSoon for now
-// and will be built out in later stages.
+// This is the top-level component. It owns all the "which page/modal is
+// currently showing" state and passes data + callback functions down to
+// its children. There's no routing library — which "page" shows is just
+// decided by plain booleans/values below, checked in the ternary chain
+// inside the return statement.
 export default function App() {
-  const [authUser, setAuthUser] = useState(null);
-  const [showLogin, setShowLogin] = useState(false);
-  const [selectedGame, setSelectedGame] = useState(null);
+  const [authUser, setAuthUser] = useState(null);   // null = logged out, otherwise { _id, name, email, role }
+  const [showLogin, setShowLogin] = useState(false); // controls the sign-in/sign-up modal overlay
+  const [selectedGame, setSelectedGame] = useState(null);   // which game's detail page is open (if any)
   const [showMyReviews, setShowMyReviews] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
   const [showManageUsers, setShowManageUsers] = useState(false);
 
+  // Runs once when the app first loads. Asks the backend "is there already
+  // a valid login cookie?" so refreshing the page doesn't log you out.
   useEffect(() => {
     authApi.me().then(setAuthUser).catch(() => setAuthUser(null));
   }, []);
 
   async function handleLogout() {
     try {
-      await authApi.logout();
+      await authApi.logout(); // tells the backend to clear the cookie
     } finally {
-      setAuthUser(null);
+      setAuthUser(null);      // clear our local "who's logged in" state either way
       setShowMyReviews(false);
     }
   }
 
+  // Callback handed down to HomePage/GameDetailPage/etc. so a click deep in
+  // the component tree can tell App "show this game's page instead."
   function handleGameClick(g) {
     setSelectedGame(g);
     setShowMyReviews(false);
@@ -49,6 +58,7 @@ export default function App() {
 
   return (
     <div className="min-h-full" style={{ background: "var(--background)" }}>
+      {/* Nav is shown on every "page" — this is the persistent template part */}
       <Nav
         authUser={authUser}
         onLoginClick={() => setShowLogin(true)}
@@ -59,16 +69,20 @@ export default function App() {
         onManageUsers={() => setShowManageUsers(true)}
       />
 
+      {/* Only ONE of these renders at a time — whichever flag is true first
+          in this chain wins. This is the "page content" slot. */}
       {showManageUsers ? (
         <AdminUsersPage currentUserId={authUser?._id} onBack={handleBack} />
       ) : showMyReviews ? (
-        <ComingSoon title="My Reviews" onBack={handleBack} />
+        <MyReviewsPage onBack={handleBack} onGameClick={handleGameClick} />
       ) : selectedGame ? (
-        <ComingSoon title={selectedGame.title} onBack={handleBack} />
+        <GameDetailPage game={selectedGame} authUser={authUser} onBack={handleBack} onLoginClick={() => setShowLogin(true)} />
       ) : (
         <HomePage authUser={authUser} onGameClick={handleGameClick} onLoginClick={() => setShowLogin(true)} />
       )}
 
+      {/* Not part of the page-switching above — these render as overlays on
+          top of whatever page is showing, independent of the ternary chain */}
       {showAdmin && <ComingSoon title="Admin Panel" onBack={() => setShowAdmin(false)} />}
       {showLogin && <LoginModal onClose={() => setShowLogin(false)} onLogin={setAuthUser} />}
 
